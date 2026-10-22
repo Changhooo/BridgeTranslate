@@ -1,0 +1,69 @@
+{
+  "name": "bridge-translate-cc",
+  "displayName": "桥译 · CC 桌面版",
+  "version": "1.0.0",
+  "description": "独立模型翻译中文提问，逐段显示中文回答；适配 Claude Code Desktop Mods。",
+  "author": {
+    "name": "Changhooo"
+  },
+  "userConfig": {
+    "protocol": {
+      "type": "string",
+      "title": "接口协议",
+      "description": "与翻译服务商提供的协议一致。",
+      "default": "chat",
+      "options": [
+        "chat",
+        "responses",
+        "anthropic",
+        "gemini"
+      ]
+    },
+    "endpoint": {
+      "type": "string",
+      "title": "翻译 API URL",
+      "description": "填写自己的 HTTPS API 基础地址或完整生成接口地址。",
+      "default": ""
+    },
+    "model": {
+      "type": "string",
+      "title": "翻译模型 ID",
+      "description": "填写服务商实际可用的模型名称。",
+      "default": ""
+    },
+    "api_key": {
+      "type": "string",
+      "title": "翻译 API Key",
+      "description": "使用系统安全凭据存储；不会加入模型对话。",
+      "sensitive": true
+    },
+    "auth": {
+      "type": "string",
+      "title": "鉴权方式",
+      "description": "通常选择 auto；本机服务可选择 none。",
+      "default": "auto",
+      "options": [
+        "auto",
+        "bearer",
+        "x-api-key",
+        "api-key",
+        "x-goog-api-key",
+        "none"
+      ]
+    },
+    "max_tokens": {
+      "type": "number",
+      "title": "输出 Token 上限",
+      "description": "每次翻译请求的输出上限。",
+      "default": 4096,
+      "min": 256,
+      "max": 65536
+    },
+    "glossary": {
+      "type": "string",
+      "title": "术语表",
+      "description": "每行填写 中文 = English，最多 4000 字。",
+      "default": ""
+    }
+  }
+}

@@ -1,0 +1,63 @@
+name: Build and publish formal release
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: formal-release
+  cancel-in-progress: false
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Set up .NET 8
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Check browser and reader logic
+        shell: pwsh
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          if ($LASTEXITCODE -ne 0) { throw 'Dependency installation failed.' }
+          npm test
+          if ($LASTEXITCODE -ne 0) { throw 'Browser checks failed.' }
+          npm run test:windows-reader
+          if ($LASTEXITCODE -ne 0) { throw 'Reader checks failed.' }
+      - name: Check core and publish Windows application
+        shell: pwsh
+        run: ./windows/build.ps1
+      - name: Package fixed-name deliverables
+        shell: pwsh
+        run: |
+          $stage = Join-Path $env:RUNNER_TEMP 'BridgeTranslateWindows'
+          New-Item -ItemType Directory -Path $stage -Force | Out-Null
+          Copy-Item 'windows/BridgeTranslate.App/bin/Release/net8.0-windows/win-x64/publish/*' $stage -Recurse -Force
+          Get-ChildItem $stage -Filter '*.pdb' -Recurse | Remove-Item
+          Copy-Item windows/LICENSES $stage -Recurse
+          Copy-Item windows/README.md (Join-Path $stage '使用指南.md')
+          Copy-Item windows/验证记录.md $stage
+          Copy-Item windows/THIRD-PARTY-NOTICES.md $stage
+          @('完整解压后运行 BridgeTranslate.exe。','本程序不依赖 Mods，不修改 CC 配置。','需要系统 WebView2 Runtime；详见使用指南。','自动发送默认关闭；真实 Claude 窗口交互仍需本机验收。') | Set-Content (Join-Path $stage '开始使用.txt') -Encoding utf8
+          Get-ChildItem $stage -File -Recurse | Sort-Object FullName | ForEach-Object { $hash = Get-FileHash $_.FullName -Algorithm SHA256; '{0}  {1}' -f $hash.Hash.ToLowerInvariant(), ([IO.Path]::GetRelativePath($stage,$_.FullName).Replace('\','/')) } | Set-Content (Join-Path $stage 'SHA256SUMS.txt') -Encoding ascii
+          New-Item -ItemType Directory -Path out -Force | Out-Null
+          Compress-Archive -Path "$stage/*" -DestinationPath out/BridgeTranslateWindows.zip -Force
+          git archive --format=zip --prefix=BridgeTranslate/ --output=out/BridgeTranslate.zip HEAD
+          if ($LASTEXITCODE -ne 0) { throw 'Source archive failed.' }
+          Copy-Item docs/media/bridge-translate-demo.mp4 out
+          Get-ChildItem out -File | ForEach-Object { $hash = Get-FileHash $_.FullName -Algorithm SHA256; '{0}  {1}' -f $hash.Hash.ToLowerInvariant(), $_.Name } | Set-Content out/SHA256SUMS.txt -Encoding ascii
+      - name: Publish first formal release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          # Preserve any existing formal release rather than moving its tag.
+          gh release view stable --json tagName 2>$null | Out-Null
+          if ($LASTEXITCODE -eq 0) { Write-Host 'Formal release exists; keeping its tag and assets unchanged.'; exit 0 }
+          gh release create stable out/BridgeTranslateWindows.zip out/BridgeTranslate.zip out/bridge-translate-demo.mp4 out/SHA256SUMS.txt --title '桥译 · 正式版' --target $env:GITHUB_SHA --notes-file docs/发布说明.md
+          if ($LASTEXITCODE -ne 0) { throw 'Release publication failed.' }

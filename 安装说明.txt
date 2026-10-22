@@ -1,0 +1,18 @@
+桥译 · Bridge Translate 正式版
+
+1. 解压 BridgeTranslate.zip，保留文件夹。
+2. Chrome 打开 chrome://extensions；Edge 打开 edge://extensions。
+3. 开启开发者模式，点击“加载已解压的扩展程序”。
+4. 选择包含 manifest.json 的 extension 文件夹。
+5. 刷新 Claude 网页，在右下角点击“设置”。
+6. 选择协议，填服务商 API URL、model ID、API Key。测试连接后，点击“授权并保存”。
+7. 中文提问点击“中文 → 英文”，检查后发送。可选“回车译后发送”默认关闭。
+8. 回答自动逐段显示中文，保留代码、公式、图片及原字号。
+
+无痕模式：先在普通窗口的扩展管理页打开桥译“详情”，允许无痕／InPrivate；再打开无痕窗口登录 Claude 并刷新。模型设置优先在普通窗口完成。
+
+详细步骤：docs/使用指南.md
+演示视频：docs/media/bridge-translate-demo.mp4（完整仓库中提供）
+正式版能力与验证范围：README.md、docs/验证记录.md
+
+更新时覆盖原 extension 目录全部文件，重新加载扩展，再刷新 Claude。安装目录不要删除或移动。

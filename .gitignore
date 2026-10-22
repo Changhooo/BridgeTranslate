@@ -1,0 +1,22 @@
+node_modules/
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+Thumbs.db
+playwright-report/
+test-results/
+.demo-build/
+*.zip
+
+**/bin/
+**/obj/
+windows/dist/
+*.pdb
+
+__pycache__/
+out/
+
+# Screenshot originals stay local; only the approved promo is published.
+docs/media/source/

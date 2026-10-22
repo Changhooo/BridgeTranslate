@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>桥译 · Bridge Translate</title><link rel="stylesheet" href="sidepanel.css">
+</head>
+<body>
+  <header class="header">
+    <div class="brand"><img src="icons/48.png" width="36" height="36" alt=""><div><h1>桥译<span>BRIDGE TRANSLATE</span></h1></div></div>
+    <span class="version">正式版</span>
+  </header>
+  <div class="connection"><div class="connection-info"><i id="connectionDot"></i><div><strong id="connectionTitle">正在检查当前页面</strong><small id="connectionSub">网页内翻译 · 独立模型接口</small></div></div><button id="connectBtn" class="text-button">连接当前页</button></div>
+  <nav class="tabs" aria-label="工作区">
+    <button class="tab active" data-tab="write" aria-selected="true">写提问</button>
+    <button class="tab" data-tab="read" aria-selected="false">读回答<span id="unread" class="unread" hidden></span></button>
+    <button class="tab" data-tab="settings" aria-selected="false">模型设置</button>
+  </nav>
+  <main>
+    <section id="write" class="view active">
+      <div class="section-top"><span class="eyebrow">用熟悉的语言，把问题说清楚</span><span class="language">中文 <span>→</span> EN</span></div>
+      <label class="field-label" for="draft">中文草稿<span id="draftCount">0 / 60000</span></label>
+      <textarea id="draft" class="draft" maxlength="60000" placeholder="在这里写中文，不必切换翻译软件。&#10;&#10;例如：帮我解释这篇论文的核心方法，并说明它对显微镜自动对焦有什么启发。"></textarea>
+      <div class="row between"><span class="hint">Ctrl / ⌘ + Enter 翻译</span><button id="translateDraft" class="primary">翻译成英文 <span>↗</span></button></div>
+      <div class="divider"></div>
+      <label class="field-label" for="english">英文预览<span class="editable">可继续编辑</span></label>
+      <textarea id="english" class="english" maxlength="60000" placeholder="译文会显示在这里。确认措辞后，再填入网页。"></textarea>
+      <div id="hanWarning" class="warning" hidden>预览中还有汉字，暂不能填入网页。请检查名称、引文和代码中的中文。</div>
+      <div class="row actions"><button id="copyEnglish" class="secondary" disabled>复制英文</button><button id="fillEnglish" class="primary" disabled>填入 Claude 提问框</button></div>
+      <div class="note"><span class="note-icon">↳</span><p>这是备用翻译区，按钮只负责翻译和填入。网页可单独开启“回车译后发送”，默认关闭。</p></div>
+      <button id="clearDraft" class="text-button subtle">清空当前草稿</button>
+    </section>
+    <section id="read" class="view">
+      <div class="section-top"><span class="eyebrow">译文直接显示在网页中</span><span class="language">EN <span>→</span> 中文</span></div>
+      <div class="auto-box"><div><strong>自动翻译新回答</strong><small>已完成段落边生成边译，末段完成后补译</small></div><label class="switch"><input id="autoTranslate" type="checkbox" checked><span></span></label></div>
+      <div class="row between read-tools"><span id="readState" class="hint">等待连接 Claude</span><button id="translateLatest" class="text-button">翻译当前回答</button></div>
+      <div id="answers" class="answers"><div class="empty-state"><div class="empty-icon">文<span>A</span></div><h2>在英文段落下，直接读中文。</h2><p>新回答生成过程中，逐段自动翻译。<br>每条回答可切换原文／双语／中文。<br>旧回答可点击旁边的“翻译”按钮。</p></div></div>
+      <button id="clearAnswers" class="text-button subtle">清空本次译文</button>
+    </section>
+    <section id="settings" class="view">
+      <div class="section-top"><span class="eyebrow">接上你自己的翻译模型</span><span class="tag">BYOK</span></div>
+      <form id="configForm" autocomplete="off">
+        <label class="field-label" for="protocol">接口协议</label>
+        <select id="protocol"><option value="chat">OpenAI 兼容 · Chat Completions</option><option value="responses">OpenAI · Responses</option><option value="anthropic">Anthropic · Messages</option><option value="gemini">Google · Gemini</option></select>
+        <label class="field-label" for="endpoint">API URL</label><input id="endpoint" type="url" placeholder="https://api.example.com/v1" required spellcheck="false">
+        <p class="hint">支持 /v1 基础地址或完整接口地址。自建网关请填完整路径；本机服务支持 HTTP。</p>
+        <label class="field-label" for="model">模型名称</label><input id="model" placeholder="填写服务商提供的 model ID" required spellcheck="false">
+        <label class="field-label" for="apiKey">API Key <span id="keyState">尚未配置</span></label>
+        <div class="key-row"><input id="apiKey" type="password" placeholder="输入密钥；留空保留同域名旧密钥" spellcheck="false" autocomplete="new-password"><button id="toggleKey" type="button" class="secondary" aria-label="显示或隐藏密钥">显示</button></div>
+        <label class="check"><input id="rememberKey" type="checkbox"><span>记住密钥<small>默认仅本次浏览器会话有效；勾选后保存在本机，未加密。</small></span></label>
+        <details class="advanced"><summary>高级设置与术语表</summary>
+          <label class="check"><input id="translateTitles" type="checkbox" checked><span>翻译侧栏对话标题<small>仅翻译当前可见会话标题；悬停看英文，关闭恢复。不重命名云端会话。标题会发送给你配置的 API。</small></span></label>
+          <label class="check"><input id="enterTranslateSend" type="checkbox"><span>回车译后发送（可选）<small>默认关闭；开启后，网页中文提问按 Enter 先译成英文再发送，Shift+Enter 换行。翻译按钮仍只翻译。</small></span></label>
+          <label class="field-label" for="auth">鉴权方式</label><select id="auth"><option value="auto">按协议自动选择</option><option value="bearer">Authorization: Bearer</option><option value="x-api-key">x-api-key</option><option value="api-key">api-key（如 Azure）</option><option value="x-goog-api-key">x-goog-api-key</option><option value="none">无密钥（本机服务）</option></select>
+          <label class="field-label" for="maxTokens">每段输出 Token 上限</label><input id="maxTokens" type="number" value="4096" min="256" max="65536" required>
+          <label class="field-label" for="tokenField">Chat Completions 的 Token 字段</label><select id="tokenField"><option value="max_tokens">max_tokens（常用兼容接口）</option><option value="max_completion_tokens">max_completion_tokens</option><option value="omit">不发送此字段（使用服务端默认值）</option></select>
+          <label class="field-label" for="glossary">术语表<span>最多 4000 字</span></label><textarea id="glossary" maxlength="4000" placeholder="显微镜自动对焦 = microscopy autofocus&#10;离焦距离 = defocus distance"></textarea>
+        </details>
+        <div class="row actions"><button type="submit" id="saveConfig" class="primary">授权并保存</button><button type="button" id="testApi" class="secondary">测试连接</button></div>
+        <p class="hint">测试直接使用当前填写的配置，只发送 “Hello.”，不自动保存。网页翻译前请点击“授权并保存”。</p>
+      </form>
+      <div class="privacy"><strong>翻译发到哪里？</strong><p>原文发送至你填写的 API。该服务商能看到翻译内容，请选用你信任的接口。插件没有自有服务器或统计上报。</p><p>本版本直接在网页输入并显示中文，不隐藏页面内容。翻译指令不会被插件附加到发给 Claude 的提问中。</p></div>
+      <button id="clearKey" class="text-button danger">删除已保存的密钥</button>
+    </section>
+  </main>
+  <footer><span id="providerLabel">先配置模型，即可开始</span><span>网页内翻译 · 自带接口</span></footer>
+  <div id="jobBar" class="job-bar" hidden><span id="jobLabel">正在翻译…</span><button id="cancelJob" class="text-button">取消</button></div>
+  <div id="toast" role="status" aria-live="polite" hidden></div>
+  <script type="module" src="sidepanel.js"></script>
+</body>
+</html>
