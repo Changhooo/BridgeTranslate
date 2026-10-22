@@ -47,21 +47,28 @@ jobs:
           Copy-Item windows/验证记录.md $stage
           Copy-Item windows/THIRD-PARTY-NOTICES.md $stage
           @('完整解压后运行 BridgeTranslate.exe。','本程序不依赖 Mods，不修改 CC 配置。','需要系统 WebView2 Runtime；详见使用指南。','自动发送默认关闭；真实 Claude 窗口交互仍需本机验收。') | Set-Content (Join-Path $stage '开始使用.txt') -Encoding utf8
-          Get-ChildItem $stage -File -Recurse | Sort-Object FullName | ForEach-Object { $hash = Get-FileHash $_.FullName -Algorithm SHA256; '{0}  {1}' -f $hash.Hash.ToLowerInvariant(), ([IO.Path]::GetRelativePath($stage,$_.FullName).Replace('\','/')) } | Set-Content (Join-Path $stage 'SHA256SUMS.txt') -Encoding ascii
+          Get-ChildItem $stage -File -Recurse | Sort-Object FullName | ForEach-Object { $hash = Get-FileHash $_.FullName -Algorithm SHA256; '{0}  {1}' -f $hash.Hash.ToLowerInvariant(), ([IO.Path]::GetRelativePath($stage,$_.FullName).Replace('\','/')) } | Set-Content (Join-Path $stage 'SHA256SUMS.txt') -Encoding utf8
           New-Item -ItemType Directory -Path out -Force | Out-Null
           Compress-Archive -Path "$stage/*" -DestinationPath out/BridgeTranslateWindows.zip -Force
           git archive --format=zip --prefix=BridgeTranslate/ --output=out/BridgeTranslate.zip HEAD
           if ($LASTEXITCODE -ne 0) { throw 'Source archive failed.' }
           Copy-Item docs/media/bridge-translate-demo.mp4 out
-          Get-ChildItem out -File | ForEach-Object { $hash = Get-FileHash $_.FullName -Algorithm SHA256; '{0}  {1}' -f $hash.Hash.ToLowerInvariant(), $_.Name } | Set-Content out/SHA256SUMS.txt -Encoding ascii
-      - name: Publish first formal release
+          Get-ChildItem out -File | ForEach-Object { $hash = Get-FileHash $_.FullName -Algorithm SHA256; '{0}  {1}' -f $hash.Hash.ToLowerInvariant(), $_.Name } | Set-Content out/SHA256SUMS.txt -Encoding utf8
+      - name: Publish checked formal release
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
-          # Preserve any existing formal release rather than moving its tag.
           gh release view stable --json tagName 2>$null | Out-Null
-          if ($LASTEXITCODE -eq 0) { Write-Host 'Formal release exists; keeping its tag and assets unchanged.'; exit 0 }
-          gh release create stable out/BridgeTranslateWindows.zip out/BridgeTranslate.zip out/bridge-translate-demo.mp4 out/SHA256SUMS.txt --title '桥译 · 正式版' --target $env:GITHUB_SHA --notes-file docs/发布说明.md
+          if ($LASTEXITCODE -eq 0) {
+            # Stable follows checked commits; reject any non-fast-forward tag move.
+            gh api --method PATCH "repos/$env:GH_REPO/git/refs/tags/stable" -f "sha=$env:GITHUB_SHA" -F force=false
+            if ($LASTEXITCODE -ne 0) { throw 'Stable tag update rejected.' }
+            gh release edit stable --title '桥译 · 正式版' --target $env:GITHUB_SHA --notes-file docs/发布说明.md
+            if ($LASTEXITCODE -ne 0) { throw 'Release metadata update failed.' }
+            gh release upload stable out/BridgeTranslateWindows.zip out/BridgeTranslate.zip out/bridge-translate-demo.mp4 out/SHA256SUMS.txt --clobber
+          } else {
+            gh release create stable out/BridgeTranslateWindows.zip out/BridgeTranslate.zip out/bridge-translate-demo.mp4 out/SHA256SUMS.txt --title '桥译 · 正式版' --target $env:GITHUB_SHA --notes-file docs/发布说明.md
+          }
           if ($LASTEXITCODE -ne 0) { throw 'Release publication failed.' }

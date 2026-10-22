@@ -183,4 +183,4 @@ dotnet publish .\BridgeTranslate.App -c Release -r win-x64 --self-contained true
 
 ## GitHub 正式版
 
-[下载 Windows 独立版](https://github.com/Changhooo/BridgeTranslate/releases/download/stable/BridgeTranslateWindows.zip)。完整解压后运行 `BridgeTranslate.exe`。首次 Windows 构建成功后创建 `stable` 正式版；后续提交仅检查和编译，保留已发布的标签与安装包。
+[下载 Windows 独立版](https://github.com/Changhooo/BridgeTranslate/releases/download/stable/BridgeTranslateWindows.zip)。完整解压后运行 `BridgeTranslate.exe`。Windows 构建检查通过后更新 `stable` 正式版；安装包采用固定名称。`stable` 标签只向后续已验证提交推进。
