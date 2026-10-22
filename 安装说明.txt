@@ -12,7 +12,6 @@
 无痕模式：先在普通窗口的扩展管理页打开桥译“详情”，允许无痕／InPrivate；再打开无痕窗口登录 Claude 并刷新。模型设置优先在普通窗口完成。
 
 详细步骤：docs/使用指南.md
-演示视频：docs/media/bridge-translate-demo.mp4（完整仓库中提供）
 正式版能力与验证范围：README.md、docs/验证记录.md
 
 更新时覆盖原 extension 目录全部文件，重新加载扩展，再刷新 Claude。安装目录不要删除或移动。

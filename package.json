@@ -4,10 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test tests/core.test.mjs tests/dom.test.mjs tests/titles.test.mjs tests/desktop.test.mjs",
-    "test:browser": "node tests/browser.test.mjs",
-    "test:desktop": "node --test tests/desktop.test.mjs",
-    "test:windows-reader": "node --test tests/windows-reader.test.mjs"
+    "test": "node --test tests/core.test.mjs tests/dom.test.mjs tests/titles.test.mjs",
+    "test:browser": "node tests/browser.test.mjs"
   },
   "devDependencies": {
     "playwright": "1.62.1",

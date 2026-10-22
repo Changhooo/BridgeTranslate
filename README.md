@@ -2,22 +2,13 @@
 
 直接在 Claude 网页完成中文提问、英文发送和回答翻译。适用于桌面版 Chrome 116+；Edge 使用同类扩展 API，需在实际浏览器中确认兼容性。无需搭建服务器，也无需编译。
 
-[下载正式版安装包](https://github.com/Changhooo/BridgeTranslate/releases/tag/stable) · [观看功能宣传片](docs/media/bridge-translate-demo.mp4)
+[下载正式版安装包](https://github.com/Changhooo/BridgeTranslate/releases/tag/stable)
 
-## Windows CC 独立桌面版
-
-新增 [Windows 独立版](windows/README.md)：下载 `BridgeTranslateWindows.zip`、完整解压后运行 `BridgeTranslate.exe`。在独立窗口写中文，使用自己的模型翻译，再填入 CC；回答从用户选定的本机会话记录或可访问文字区域读取，在旁边逐段显示中文。自动发送默认关闭。
-
-本版不依赖 Mods、Hooks 或浏览器扩展，不改 CC 配置。已有 Windows x64 可执行构建，尚未完成真实 Windows CC 验收，见 [桌面验证记录](windows/验证记录.md)。`desktop/` 下旧 Mods 方案保留作源码参考，不是当前推荐安装包。
-
-## 使用教程与演示
+## 使用教程
 
 - [完整使用指南](docs/使用指南.md)：从零安装、接口配置、逐段翻译、复制、无痕模式与排错。
-- [演示视频](docs/media/bridge-translate-demo.mp4)：45 秒、1080p 的截图宣传片，展示回车译后发送、自带 API 与中英对照。基于用户提供的实际截图制作，操作衔接与接口配置为示意。
-- [演示说明与时间轴](docs/演示说明.md)。
 - [正式版说明](docs/正式版说明.md)。
 
-![演示预览](docs/media/demo-poster.png)
 
 ## 安装
 

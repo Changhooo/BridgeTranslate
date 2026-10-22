@@ -7,16 +7,13 @@ node_modules/
 Thumbs.db
 playwright-report/
 test-results/
-.demo-build/
 *.zip
 
-**/bin/
-**/obj/
-windows/dist/
-*.pdb
 
 __pycache__/
 out/
 
-# Screenshot originals stay local; only the approved promo is published.
-docs/media/source/
+
+# Local media exports and supplied screenshots are not published.
+.demo-build/
+docs/media/
