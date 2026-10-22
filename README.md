@@ -1,6 +1,8 @@
 # 桥译 · Bridge Translate
 
-直接在 Claude 网页完成中文提问、英文发送和回答翻译。适用于桌面版 Chrome 116+；Edge 使用同类扩展 API，需在实际浏览器中确认兼容性。无需搭建服务器，也无需编译。
+**桥译（Bridge Translate）是专为 Claude 网页制作的中英翻译器。** 支持中文提问转英文、可选回车译后发送、英文回答逐段翻译为中文，以及侧栏对话标题翻译。翻译使用你配置的模型 API。
+
+适用于桌面版 Chrome 116+；Edge 使用同类扩展 API，需在实际浏览器中确认兼容性。无需搭建服务器，也无需编译。
 
 [下载正式版安装包](https://github.com/Changhooo/BridgeTranslate/releases/tag/stable)
 
